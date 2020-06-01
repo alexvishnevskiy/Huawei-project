@@ -3,7 +3,7 @@ This repository contains code for pre-training and fine-tuning BART, as well as 
 NLP course template is a summary of what I have done.
 ## Results
 
-## Architectures that I have used
+## Architectures
 * BART
 * SummaRuNNer
 * LEAD-N
