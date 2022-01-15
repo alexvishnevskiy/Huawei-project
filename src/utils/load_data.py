@@ -16,6 +16,7 @@ def read_gazeta(path: str):
         json_list = list(json_file)
 
     result = pd.DataFrame.from_dict([json.loads(json_str) for json_str in json_list])
+    result = result.drop_duplicates(subset =['text', 'title', 'summary'])
     if not os.path.exists('./data/gazeta'):
         os.mkdir('./data/gazeta')
     result.to_csv(f'./data/gazeta/{path.stem}.csv', index = False)
@@ -79,6 +80,15 @@ class RIA:
                 data_dict = {'text':text, 'title':title}
                 data = pd.concat([data, pd.DataFrame(data_dict, index =[i])])
         data.to_csv(f'./data/ria/data_{i//self.chunk_size}.csv', index = False)
+
+    @staticmethod
+    def load_data(path):
+        data = pd.concat([
+            pd.read_csv(os.path.join(path, f'data_{i}.csv')) for i in range(1, len(os.listdir(path)))
+            ])
+        data[['text', 'title']] = data[['text', 'title']].astype('string')
+        data.dropna(inplace = True)
+        return data
                 
     def get_data(self):
         self._unzip_file()
