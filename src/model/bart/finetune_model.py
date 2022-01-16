@@ -3,17 +3,29 @@ from pytorch_lightning.core.lightning import LightningModule
 from nltk.translate.bleu_score import corpus_bleu
 from src.loaders import FineTuneLoader
 from collections import OrderedDict
+import pandas as pd
 import torch
 
 
 class BART_finetune(LightningModule):
-    def __init__(self, bart_config: dict, parameters: dict, data_train, data_val, tokenizer):
+    def __init__(
+        self, 
+        bart_config: dict, 
+        parameters: dict, 
+        data_train: pd.DataFrame, 
+        data_val: pd.DataFrame, 
+        col_article: str,
+        col_summary: str,
+        tokenizer
+        ):
         super().__init__()
 
-        self.bart = self.__load_model(bart_config, parameters.pretrained)
+        self.bart = self.__load_model(bart_config, parameters.get('pretrained_path'))
         self.tokenizer = tokenizer
         self.data_train = data_train
         self.data_val = data_val
+        self.col_article = col_article
+        self.col_summary = col_summary
         self.cfg = parameters
 
     def forward(self, decoder_input_ids = None, input_ids=None, attention_mask=None, labels = None):
@@ -23,9 +35,9 @@ class BART_finetune(LightningModule):
                                 labels = labels)
         return bart_output
 
-    def __load_model(self, bart_config, pretrained = False):
-        if pretrained:
-            bart = load_bart(bart_config, self.cfg.pretrained_path)
+    def __load_model(self, bart_config, pretrained_path = None):
+        if pretrained_path is not None:
+            bart = load_bart(bart_config, pretrained_path)
         else:
             bart = BartForConditionalGeneration(bart_config)
         return bart
@@ -34,8 +46,8 @@ class BART_finetune(LightningModule):
         return FineTuneLoader.load(
             data = self.data_train if stage == 'train' else self.data_val,
             tokenizer = self.tokenizer, 
-            col_article = self.cfg.col_article,
-            col_summary = self.cfg.col_summary,
+            col_article = self.col_article,
+            col_summary = self.col_summary,
             batch_size = self.cfg.batch_size,
             max_length = self.cfg.max_length,
             shuffle = True if stage == 'train' else False

@@ -1,0 +1,9 @@
+bart:
+  vocab_size: tokenizer.get_vocab_size()
+  pad_token_id: tokenizer.token_to_id("<pad>")
+  bos_token_id: tokenizer.token_to_id("<s>")
+  eos_token_id: tokenizer.token_to_id("</s>")
+  encoder_layers: 6
+  decoder_layers: 6
+  activation_function: gelu
+  dropout: 0.1

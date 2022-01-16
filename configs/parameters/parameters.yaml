@@ -1,0 +1,35 @@
+checkpoints:
+  save_path: model/checkpoints
+  monitor: avg_bleu
+  mode: max
+  min_delta: 0.05
+  patience: 2
+  verbose: true
+
+dataset:
+  dataset_name: ria #ria, gazeta
+  col_article: text
+  col_summary: title
+  n_rows: 500000
+  chunk_size: 10000
+  test_size: 0.02
+
+tokenizer:
+  train: false
+  max_length: 750
+
+model:
+  # whether to pretrain or finetune
+  # if you want to finetune model choose finetune key, if you want to pretrain
+  # choose pretrain key
+  finetune: # finetune or pretrain
+    #pretrained_path: path of the pretrained model
+    train_args:
+      n_gpus: 1
+      lr: 1e-5
+      max_lr: 1e-4
+      pct_start: 0.06
+      num_epoch: 5
+      batch_size: 8
+      acc_step: 16
+      max_length: ${tokenizer.max_length}

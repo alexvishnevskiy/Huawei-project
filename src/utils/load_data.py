@@ -98,17 +98,7 @@ class RIA:
         shutil.rmtree('./data/ria')
         os.remove(self.json_path)
 
-def collect_data(n_rows, chunk_size):
+def collect_gazeta():
     read_gazeta('data/gazeta_test.jsonl')
     read_gazeta('data/gazeta_train.jsonl')
     read_gazeta('data/gazeta_val.jsonl')
-    RIA('data/ria.json.gz', n_rows, chunk_size).get_data()
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Data collection")
-    parser.add_argument("-n_rows", type = int, default=500_000)
-    parser.add_argument("-chunk_size", type = int, default=10_000)
-    
-    args = parser.parse_args()
-    collect_data(args.n_rows, args.chunk_size)
-    

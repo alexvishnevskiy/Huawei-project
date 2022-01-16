@@ -2,16 +2,28 @@ from transformers import BartForConditionalGeneration
 from pytorch_lightning.core.lightning import LightningModule
 from nltk.translate.bleu_score import corpus_bleu
 from src.loaders import PretrainLoader
+import pandas as pd
 import torch
 
 
 class BART(LightningModule):
-    def __init__(self, bart_config, parameters, data_train, data_val, tokenizer):
+    def __init__(
+        self, 
+        bart_config: dict, 
+        parameters: dict, 
+        data_train: pd.DataFrame, 
+        data_val: pd.DataFrame, 
+        col_article: str,
+        col_summary: str,
+        tokenizer
+        ):
         super().__init__()
 
         self.bart = BartForConditionalGeneration(bart_config)
         self.data_train = data_train
         self.data_val = data_val
+        self.col_article = col_article
+        self.col_summary = col_summary
         self.tokenizer = tokenizer
         self.cfg = parameters
         self.save_hyperparameters(ignore=["data_train", "data_val", "tokenizer"])
@@ -28,8 +40,8 @@ class BART(LightningModule):
         return PretrainLoader.load(
             data = self.data_train if stage == 'train' else self.data_val,
             tokenizer = self.tokenizer, 
-            max_length = self.cfg.get('max_length', 750),
-            batch_size = self.cfg.get('batch_size', 8),
+            max_length = self.cfg.max_length,
+            batch_size = self.cfg.batch_size,
             sentence_permutation = self.cfg.get('sentence_permutation', True),
             token_masking = self.cfg.get('token_masking', False),
             token_deletion = self.cfg.get('token_deletion', False),
@@ -44,7 +56,7 @@ class BART(LightningModule):
         return self.__dataloader('val')
 
     def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(self.parameters(), lr=self.cfg.get('lr', 1e-4))
+        optimizer = torch.optim.AdamW(self.parameters(), lr=self.cfg.lr)
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, self.cfg.get('step', 1), gamma = self.cfg.get('gamma', 0.7))
         return [optimizer], [scheduler]
 

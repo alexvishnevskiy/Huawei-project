@@ -1,5 +1,6 @@
 from tokenizers.processors import BertProcessing
 from tokenizers import ByteLevelBPETokenizer
+from pathlib import Path
 import os
 
 
@@ -9,7 +10,7 @@ class CustomTokenizer(ByteLevelBPETokenizer):
     def __init__(self, vocab = None, merges = None):
         super().__init__(vocab, merges)
 
-    def train(self, data, vocab_size = 35_000, dir_path = 'model/tokenizer'):
+    def train(self, data, vocab_size = 35_000):
         if isinstance(data, str):
             super().train(
                 data, 
@@ -23,19 +24,20 @@ class CustomTokenizer(ByteLevelBPETokenizer):
                 special_tokens=self.special_tokens
             )
 
-        if not os.path.exists(dir_path):
+        dir_path = Path(__file__).parents[2]/'model/tokenizer'
+        if not dir_path.exists():
             os.makedirs(dir_path)
         self.save_model(dir_path)
 
     @classmethod
     def load_from_pretrained(
-        cls, 
-        vocab = 'model/tokenizer/vocab.json', 
-        merges = 'model/tokenizer/merges.txt', 
+        cls,
         max_length = 750
         ):
+        vocab = Path(__file__).parents[2]/'model/tokenizer/vocab.json'
+        merges = Path(__file__).parents[2]/'model/tokenizer/merges.txt'
 
-        tokenizer = cls(vocab, merges)
+        tokenizer = cls(str(vocab), str(merges))
         tokenizer._tokenizer.post_processor = BertProcessing(
             ("</s>", tokenizer.token_to_id("</s>")),
             ("<s>", tokenizer.token_to_id("<s>")),
