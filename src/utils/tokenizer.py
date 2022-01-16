@@ -27,7 +27,7 @@ class CustomTokenizer(ByteLevelBPETokenizer):
         dir_path = Path(__file__).parents[2]/'model/tokenizer'
         if not dir_path.exists():
             os.makedirs(dir_path)
-        self.save_model(dir_path)
+        self.save_model(str(dir_path))
 
     @classmethod
     def load_from_pretrained(

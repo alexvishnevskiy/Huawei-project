@@ -1,8 +1,11 @@
+from distutils.command.config import config
+from src.utils.tokenizer import CustomTokenizer
 from transformers import BartForConditionalGeneration
 from pytorch_lightning.core.lightning import LightningModule
 from nltk.translate.bleu_score import corpus_bleu
 from src.loaders import FineTuneLoader
 from collections import OrderedDict
+import numpy as np
 import pandas as pd
 import torch
 
@@ -117,3 +120,28 @@ def load_bart(config, path):
 
     bart.load_state_dict(new_state_dict)
     return bart
+
+@torch.no_grad()
+def generate_summary(config, path, text, max_length = 750, num_beams = 5):
+    model = load_bart(config, path)
+    model.eval()
+    model.cuda()
+
+    tokenizer = CustomTokenizer.load_from_pretrained(max_length)
+    token_to_id = lambda x: tokenizer.token_to_id(x)
+    special_tokens = [token_to_id(x) for x in ["<pad>", "<s>", "</s>", "<mask>"]]
+
+    ids = np.asarray(tokenizer.encode(text).ids)
+    input_ids = torch.from_numpy(ids)
+
+    output = model.generate(
+        inputs = input_ids.unsqueeze(0).cuda(),
+        max_length = max_length,
+        num_beams = num_beams
+        )
+    output = output.squeeze().cpu().numpy().tolist()
+    output = list(
+        filter(lambda x: all([x != spec_t for spec_t in special_tokens]), output)
+    )
+    output = tokenizer.decode(output)
+    return output
