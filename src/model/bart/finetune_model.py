@@ -76,7 +76,7 @@ class BART_finetune(LightningModule):
         scheduler = {
             'scheduler': scheduler,
             'interval': 'step',
-            'frequency': 1
+            'frequency': self.cfg.acc_step
         }
         return [optimizer], [scheduler]
 

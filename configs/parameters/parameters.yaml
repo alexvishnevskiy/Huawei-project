@@ -1,6 +1,6 @@
 checkpoints:
   save_path: model/checkpoints
-  monitor: avg_bleu
+  monitor: bleu
   mode: max
   min_delta: 0.05
   patience: 2

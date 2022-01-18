@@ -84,5 +84,5 @@ class BART(LightningModule):
         avg_bleu = torch.stack([x['bleu'] for x in outputs]).mean()
 
         tensorboard_logs = {'val_loss': avg_loss, 'avg_bleu': avg_bleu}
-        self.log('avg_bleu', avg_bleu)
-        return {'val_loss': avg_loss, 'avg_bleu': avg_bleu, 'progress_bar': tensorboard_logs}
+        self.log('bleu', avg_bleu)
+        return {'val_loss': avg_loss, 'bleu': avg_bleu, 'progress_bar': tensorboard_logs}
