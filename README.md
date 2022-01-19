@@ -68,7 +68,7 @@ You can download finetuned model using gdown or use your own.
 ```
 gdown https://drive.google.com/uc?id=1-pl-7i9a7QZrTNybZvaicIVmlcUbagMH
 ```
-Then you can either generate summaries for the specific text using API.
+Then you can generate summaries for the specific text using API.
 
 ```python
 from src.model.bart.finetune_model import generate_summary
