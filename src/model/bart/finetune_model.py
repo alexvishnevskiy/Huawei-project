@@ -112,7 +112,9 @@ class BART_finetune(LightningModule):
 
 def load_bart(config, path):
     bart = BartForConditionalGeneration(config)
-    old_state_dict = torch.load(path)['state_dict']
+    old_state_dict = torch.load(path)
+    if 'state_dict' in old_state_dict.keys():
+        old_state_dict = old_state_dict['state_dict']
     new_state_dict = OrderedDict()
     
     for k, v in old_state_dict.items():

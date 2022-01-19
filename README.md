@@ -59,8 +59,24 @@ model:
       max_length: ${tokenizer.max_length}
 ```
 And then run it :
-```python
+```
 python src/train.py
+```
+
+## Inference
+You can download finetuned model using gdown or use your own.
+```
+gdown https://drive.google.com/uc?id=1-pl-7i9a7QZrTNybZvaicIVmlcUbagMH
+```
+Then you can either generate summaries for the specific text using API.
+
+```python
+from src.model.bart.finetune_model import generate_summary
+
+#config - bart config
+#path - path to the finetuned model
+#text - text of the article
+summary = generate_summary(config, path, text, max_length = 750, num_beams = 5)
 ```
 
 ## Code structure
